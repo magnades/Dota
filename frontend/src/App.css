@@ -1,0 +1,96 @@
+/*.App {*/
+/*  text-align: center;*/
+/*}*/
+
+/*.App-logo {*/
+/*  height: 40vmin;*/
+/*  pointer-events: none;*/
+/*}*/
+
+/*@media (prefers-reduced-motion: no-preference) {*/
+/*  .App-logo {*/
+/*    animation: App-logo-spin infinite 20s linear;*/
+/*  }*/
+/*}*/
+
+/*.App-header {*/
+/*  background-color: #282c34;*/
+/*  min-height: 100vh;*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  align-items: center;*/
+/*  justify-content: center;*/
+/*  font-size: calc(10px + 2vmin);*/
+/*  color: white;*/
+/*}*/
+
+/*.App-link {*/
+/*  color: #61dafb;*/
+/*}*/
+
+/*@keyframes App-logo-spin {*/
+/*  from {*/
+/*    transform: rotate(0deg);*/
+/*  }*/
+/*  to {*/
+/*    transform: rotate(360deg);*/
+/*  }*/
+/*}*/
+
+/* src/App.css */
+.App {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); /* Ajusta el número de columnas automáticamente */
+  gap: 10px; /* Espaciado entre imágenes */
+  justify-content: center; /* Centra las imágenes horizontalmente */
+  align-items: center; /* Centra las imágenes verticalmente */
+  padding: 20px; /* Espaciado interno */
+}
+
+.hero-image {
+  width: 100%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s;
+}
+
+.hero-image:hover {
+  border: 2px solid #007bff;
+}
+
+.selected {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.selected ul {
+  list-style: none;
+  padding: 0;
+}
+
+.position-image {
+  width: 80px;
+  height: 80px;
+  margin: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.position-image:hover {
+  transform: scale(1.1);
+}
+
+.position-image.selected {
+  border: 3px solid #00ff00; /* Resalta la imagen seleccionada */
+  border-radius: 10px;
+}

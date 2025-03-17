@@ -1,0 +1,146 @@
+import requests
+from collections import defaultdict
+import logging
+
+# Configurar logging (opcional)
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+
+
+class DotaHeroRecommender:
+    def __init__(self):
+        self.hero_data = self._fetch_hero_data()
+        self.counters = self._get_counters_data()
+        self.players = self._get_players_data()
+        # Mapeo de roles numéricos a nombres de posiciones deseadas
+        self.positions = {
+            1: "Carry",
+            2: "Mid",
+            3: "Offlane",
+            4: "Soft Support",
+            5: "Hard Support"
+        }
+
+    def get_heroes_data(self):
+        heroes_dict = self.hero_data
+
+        heroes_list = [{"id": hero_id, "name": details['localized_name']} for hero_id, details in heroes_dict.items()]
+        return heroes_list
+
+    def get_players_info(self):
+        players_info_dict = self.players
+
+        players_info_list = [{"id": player_id, "name": name} for name, player_id in players_info_dict.items()]
+        return players_info_list
+
+    def _get_players_data(self):
+        return self.load_json("Data/players_information.json")
+
+
+    def _fetch_hero_data(self) -> dict:
+        """
+        Obtiene información de héroes desde la API de OpenDota y la organiza en un diccionario
+        donde la clave es el ID del héroe.
+        """
+        heroes =  self.load_json("Data/heroes.json")
+        logging.info("Se obtuvieron datos de %d héroes", len(heroes))
+        result = {}
+
+        for hero, values in heroes.items():
+            result[values['id']] = values
+
+        return result
+
+
+    def _get_counters_data(self) -> dict:
+        """
+        Retorna datos de contra-picks (counters) de forma simplificada para algunos héroes.
+        Los datos indican a qué héroes es fuerte (strong_against) y contra quién es débil (weak_against).
+        Estos datos son ficticios y deben ampliarse con información real.
+        """
+        return self.load_json("Data/matchups.json")
+
+    @staticmethod
+    def load_json(filename: str):
+        import json
+
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            print(f"El archivo '{filename}' no existe.")
+            data = None
+
+        return data
+
+    def recommend_heroes(self, allies: list, enemies: list, position: int, num_recom: int) -> list:
+        """
+        Recomienda héroes basándose en:
+          - Contra-picks de los enemigos (si un enemigo es débil ante cierto héroe, se suma mayor puntuación).
+          - Sinergia con los aliados (si un aliado tiene buena sinergia con cierto héroe, se suma una bonificación).
+          - Coincidencia con el rol deseado, evaluado según la lista de roles del héroe obtenido de la API.
+
+        Parámetros:
+          - allies: Lista de IDs de héroes ya seleccionados como aliados.
+          - enemies: Lista de IDs de héroes enemigos.
+          - position: Código numérico del rol deseado (1: Carry, 2: Mid, 3: Offlane, 4: Soft Support, 5: Hard Support).
+
+        Retorna:
+          - Lista con los IDs de los 3 héroes recomendados.
+        """
+        all_heroes = set(self.hero_data.keys())
+        banned = set(allies + enemies)
+        candidates = all_heroes - banned
+
+        scores = defaultdict(int)
+
+        # Factor 1: Contra-picks enemigos (aumenta 3 puntos si el candidato es débil contra el enemigo)
+        for enemy in enemies:
+            if str(enemy) in self.counters:
+                for counter in self.counters[str(enemy)].get('weak_against', []):
+                    if counter in candidates:
+                        scores[counter] += 3
+
+        # Factor 2: Sinergia con aliados (aumenta 2 puntos si el candidato es fuerte contra el aliado)
+        for ally in allies:
+            if str(ally) in self.counters:
+                for synergy in self.counters[str(ally)].get('strong_against', []):
+                    if synergy in candidates:
+                        scores[synergy] += 2
+
+        # Factor 3: Bonus por rol deseado
+        desired_role = self.positions.get(position, "")
+        if desired_role:
+            for candidate in candidates:
+                hero = self.hero_data.get(candidate, {})
+                hero_roles = hero.get("roles", [])
+                if desired_role in hero_roles:
+                    scores[candidate] += 1  # Bonus de 1 punto por coincidir con el rol deseado
+
+        # Ordenar candidatos por puntuación (de mayor a menor)
+        sorted_candidates = sorted(candidates, key=lambda x: scores[x], reverse=True)
+        logging.info("Puntuaciones de candidatos: %s", {k: scores[k] for k in sorted_candidates})
+
+        recommendations = sorted_candidates[:num_recom]
+
+        print(f"Recomendaciones para {self.positions[position]}:")
+        for hero_id in recommendations:
+            hero_name = self.get_hero_from_id(hero_id)[0]
+            print(f"- {hero_name}")
+
+        return recommendations
+
+    def get_hero_from_id(self, hero_id: int):
+        heroes = self.load_json("Data/heroes.json")
+        for hero_name, hero_details in heroes.items():
+            if hero_details.get("id") == hero_id:
+                # print(f'Heroe encontrado: {hero_name}')
+                return hero_name, hero_details
+
+        return None, None
+
+
+EN ESTA FUNCION TOCA INCLUIR TODA LAS FUNCIONES PARA REALIZAR LA RECOMENDACION PARA UN JUGADOR QUE SE ENCUENTRAN EN EL ARCHIVO RECOMMENDER.PY
+TAMBIEN TOCA REVISAR QUE SE ESTA ENVIANDO DE LA APLICACION DE REACT CUANDO SE SELECCIONA AL JUGADOR POR QUE HASTA EL MOMENTO NO SE TIENE NADA
+
+
+
