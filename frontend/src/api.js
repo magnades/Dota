@@ -16,13 +16,13 @@ export const getRecommendations = async (allies, enemies, position, num_recom) =
   return response.json();
 };
 
-export const getRecommendationsForPlayer = async (allies, enemies, position, player, num_recom) => {
+export const getRecommendationsForPlayer = async (allies, enemies, position, player_name, num_recom) => {
   const response = await fetch(`${API_URL}/api/recommendforplayer`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ allies, enemies, position, player, num_recom }),
+    body: JSON.stringify({ allies, enemies, position, player_name, num_recom }),
   });
 
   if (!response.ok) {

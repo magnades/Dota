@@ -1,43 +1,3 @@
-/*.App {*/
-/*  text-align: center;*/
-/*}*/
-
-/*.App-logo {*/
-/*  height: 40vmin;*/
-/*  pointer-events: none;*/
-/*}*/
-
-/*@media (prefers-reduced-motion: no-preference) {*/
-/*  .App-logo {*/
-/*    animation: App-logo-spin infinite 20s linear;*/
-/*  }*/
-/*}*/
-
-/*.App-header {*/
-/*  background-color: #282c34;*/
-/*  min-height: 100vh;*/
-/*  display: flex;*/
-/*  flex-direction: column;*/
-/*  align-items: center;*/
-/*  justify-content: center;*/
-/*  font-size: calc(10px + 2vmin);*/
-/*  color: white;*/
-/*}*/
-
-/*.App-link {*/
-/*  color: #61dafb;*/
-/*}*/
-
-/*@keyframes App-logo-spin {*/
-/*  from {*/
-/*    transform: rotate(0deg);*/
-/*  }*/
-/*  to {*/
-/*    transform: rotate(360deg);*/
-/*  }*/
-/*}*/
-
-/* src/App.css */
 .App {
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -93,4 +53,47 @@ h1, h2 {
 .position-image.selected {
   border: 3px solid #00ff00; /* Resalta la imagen seleccionada */
   border-radius: 10px;
+}
+
+/* Estilos para el contenedor de equipos */
+.teams-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+/* Estilos para cada equipo */
+.team {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.team h2 {
+  text-align: center;
+}
+
+.team ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.team li {
+  background-color: #f0f0f0;
+  margin: 5px 0;
+  padding: 10px;
+  text-align: center;
+}
+
+.selection-container {
+  display: flex;
+  justify-content: space-between; /* Distribuye el espacio entre las selecciones */
+}
+
+.player-selection, .position-selection {
+  flex: 1; /* Cada sección ocupa un espacio igual */
+}
+
+.positions-grid {
+  display: flex;
+  justify-content: center; /* Centra las posiciones dentro de su contenedor */
 }

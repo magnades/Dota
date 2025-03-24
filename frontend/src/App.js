@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {fetchHeroes, fetchPlayers, getRecommendations} from "./api";
+import { fetchHeroes, fetchPlayers, getRecommendations, getRecommendationsForPlayer } from "./api";
 import "./App.css";
 
 const positions = [
@@ -17,85 +17,48 @@ function App() {
   const [enemies, setEnemies] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(null);
-    const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [selectedPlayerName, setSelectedPlayerName] = useState(null);
 
   useEffect(() => {
-    const getHeroes = async () => {
-      const data = await fetchHeroes();
-      setHeroes(data);
-    };
-
-    getHeroes();
+    fetchHeroes().then(setHeroes).catch(console.error);
+    fetchPlayers().then(setPlayers).catch(console.error);
   }, []);
 
-  useEffect(() => {
-    const getPlayers = async () => {
-      const data = await fetchPlayers();
-      setPlayers(data);
-    };
+  const toggleSelection = (hero, list, setList) => {
+    setList(list.some((h) => h.id === hero.id) ? list.filter((h) => h.id !== hero.id) : [...list, hero]);
+  };
 
-    getPlayers();
-  }, []);
-
-  const handleLeftClick = (hero) => {
-    if (!allies.find((h) => h.id === hero.id)) {
-      setAllies([...allies, hero]);
+  const fetchRecommendations = async () => {
+    if (!selectedPosition) return alert("Por favor, selecciona una posición antes de pedir recomendaciones.");
+    try {
+      const response = await getRecommendations(
+        allies.map((h) => h.id),
+        enemies.map((h) => h.id),
+        selectedPosition,
+        3
+      );
+      setRecommendations(response.recommendations || []);
+    } catch (error) {
+      console.error("Error al obtener recomendaciones:", error);
     }
   };
 
-  const handleRightClick = (event, hero) => {
-    event.preventDefault();
-    if (!enemies.find((h) => h.id === hero.id)) {
-      setEnemies([...enemies, hero]);
+  const fetchRecommendationsForPlayer = async () => {
+    if (!selectedPlayerName) return alert("Por favor, selecciona un jugador antes de pedir recomendaciones.");
+    if (!selectedPosition) return alert("Por favor, selecciona una posición antes de pedir recomendaciones.");
+    try {
+      const response = await getRecommendationsForPlayer(
+        allies.map((h) => h.id),
+        enemies.map((h) => h.id),
+        selectedPosition,
+        selectedPlayerName,
+        5
+      );
+      setRecommendations(response.recommendations || []);
+    } catch (error) {
+      console.error("Error al obtener recomendaciones para jugador:", error);
     }
   };
-
- const fetchRecommendations = async () => {
-  if (!selectedPosition) {
-    alert("Por favor, selecciona una posición antes de pedir recomendaciones.");
-    return;
-  }
-
-  const payload = {
-      allies: allies.map((h) => h.id),
-      enemies: enemies.map((h) => h.id),
-      position: selectedPosition, // Usa la posición seleccionada
-      num_recom: 3,
-  };
-
-  console.log("Datos enviados a la API:", payload);
-
-  try {
-    const response = await getRecommendations(payload.allies, payload.enemies, payload.position, payload.num_recom);
-    setRecommendations(response.recommendations);
-  } catch (error) {
-    console.error("Error al obtener recomendaciones:", error);
-  }
-};
-
- const fetchRecommendationsForPlayer = async () => {
-  if (!selectedPlayer) {
-    alert("Por favor, selecciona un jugador antes de pedir recomendaciones.");
-    return;
-  }
-
-  const payloadforplayer = {
-      allies: allies.map((h) => h.id),
-      enemies: enemies.map((h) => h.id),
-      position: selectedPosition, // Usa la posición seleccionada
-      playerId: selectedPlayer,
-      num_recom: 3,
-  };
-
-  console.log("Datos enviados a la API:", payloadforplayer);
-
-  try {
-    const response = await getRecommendationsForPlayer(payloadforplayer.allies, payloadforplayer.enemies, payloadforplayer.position, payloadforplayer.playerId, payloadforplayer.num_recom);
-    setRecommendations(response.recommendations);
-  } catch (error) {
-    console.error("Error al obtener recomendaciones:", error);
-  }
-};
 
   return (
     <div className="App">
@@ -104,77 +67,72 @@ function App() {
         {heroes.map((hero) => (
           <img
             key={hero.id}
-            src={`/hero_images/${hero.id}.png`} // Asume que las imágenes están nombradas por ID
+            src={`/hero_images/${hero.id}.png`}
             alt={hero.name}
-            onClick={() => handleLeftClick(hero)}
-            onContextMenu={(e) => handleRightClick(e, hero)}
+            onClick={() => toggleSelection(hero, allies, setAllies)}
+            onContextMenu={(e) => { e.preventDefault(); toggleSelection(hero, enemies, setEnemies); }}
             className="hero-image"
           />
         ))}
       </div>
-      <div className="selected-teams">
-        <div>
-          <h2>Equipo Aliado:</h2>
-          <ul>
-            {allies.map((hero) => (
-              <li key={hero.id}>{hero.name}</li>
-            ))}
-          </ul>
-        </div>
 
-        <div>
+      {/* Contenedor para los equipos aliados y enemigos */}
+      <div className="teams-container">
+        <div className="team">
+          <h2>Equipo Aliado:</h2>
+          <ul>{allies.map((hero) => (<li key={hero.id}>{hero.name}</li>))}</ul>
+        </div>
+        <div className="team">
           <h2>Equipo Enemigo:</h2>
-          <ul>
-            {enemies.map((hero) => (
-              <li key={hero.id}>{hero.name}</li>
-            ))}
-          </ul>
+          <ul>{enemies.map((hero) => (<li key={hero.id}>{hero.name}</li>))}</ul>
         </div>
       </div>
 
       <button onClick={fetchRecommendations}>Obtener Recomendaciones</button>
 
+
+
+
+        <div className="selection-container">
+          <div className="player-selection">
+            <h2>Selecciona el Jugador:</h2>
+            {players.map((player) => (
+              <img
+                key={player.name}
+                src={`/player_images/${player.id}.jpg`}
+                alt={player.name}
+                className={`position-image ${selectedPlayerName === player.name ? "selected" : ""}`}
+                onClick={() => setSelectedPlayerName(player.name)}
+              />
+            ))}
+          </div>
+          <div className="position-selection">
+            <h2>Selecciona tu posición:</h2>
+            <div className="positions-grid">
+              {positions.map((pos) => (
+                <img
+                  key={pos.id}
+                  src={pos.image}
+                  alt={pos.name}
+                  className={`position-image ${selectedPosition === pos.id ? "selected" : ""}`}
+                  onClick={() => setSelectedPosition(pos.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+      <button onClick={fetchRecommendationsForPlayer}>Obtener Héroes para Jugador</button>
+
       <div className="selected">
         <h2>Recomendaciones:</h2>
-        <ul>
-          {recommendations.map((heroId) => (
-            <li key={heroId}>ID de héroe recomendado: {heroId}</li>
-          ))}
-        </ul>
+        <ul>{recommendations.map((heroId) => (<li key={heroId}>ID de héroe recomendado: {heroId}</li>))}</ul>
       </div>
-
-      <div className="positions">
-        <h2>Selecciona tu posición:</h2>
-        <div className="positions-grid">
-          {positions.map((pos) => (
-            <img
-              key={pos.id}
-              src={pos.image}
-              alt={pos.name}
-              className={`position-image ${selectedPosition === pos.id ? "selected" : ""}`}
-              onClick={() => setSelectedPosition(pos.id)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="positions">
-          <h2>Selecciona el Jugador:</h2>
-        {players.map((player) => (
-          <img
-            key={player.id}
-            src={`/player_images/${player.id}.jpg`} // Asume que las imágenes están nombradas por ID
-            alt={player.name}
-            className={`position-image ${selectedPlayer === player.id ? "selected" : ""}`}
-              onClick={() => setSelectedPlayer(player.name)}
-          />
-        ))}
-      </div>
-
-        <button onClick={fetchRecommendationsForPlayer}>Obtener Heroes para Jugador</button>
-
     </div>
   );
 }
 
 export default App;
+
+
+HACER QUE EL PROGRAMA RESALTE LOS HEROES RECOMENDADOS EN LA LISTA

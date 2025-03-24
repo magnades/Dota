@@ -60,7 +60,7 @@ save_json(steam_id_dict, "players_information.json")
 #
 # data = get_player_heroes(player_id)
 
-update_players_heroes_strengths()
+# update_players_heroes_strengths()
 
 recommendations = recommender.recommend_heroes_for_player(allies, enemies, position, 'Magnades',5 )
 
