@@ -1,5 +1,8 @@
-// const API_URL = "http://127.0.0.1:8000";
-const API_URL = "https://dota-backend.onrender.com/api";
+const API_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://127.0.0.1:8000"
+    : "https://dota-backend.onrender.com";
+
 
 export const getRecommendations = async (allies, enemies, position, num_recom) => {
   const response = await fetch(`${API_URL}/api/recommend`, {
