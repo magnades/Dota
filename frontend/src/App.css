@@ -16,17 +16,6 @@ h1, h2 {
   padding: 20px; /* Espaciado interno */
 }
 
-.hero-image {
-  width: 100%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: border 0.2s;
-}
-
-.hero-image:hover {
-  border: 2px solid #007bff;
-}
-
 .selected {
   display: flex;
   justify-content: space-around;
@@ -97,3 +86,145 @@ h1, h2 {
   display: flex;
   justify-content: center; /* Centra las posiciones dentro de su contenedor */
 }
+
+.search-box {
+  padding: 8px;
+  margin: 12px 0;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  width: 200px;
+}
+
+
+.hero-image.ally {
+  border: 2px solid #00FF00;   /* antes 3px → ahora más fino */
+  animation: greenFlames 1.5s infinite alternate;
+}
+
+@keyframes greenFlames {
+  0% {
+    box-shadow: 0 0 6px 1px rgba(0, 255, 0, 0.6),
+                0 0 12px 2px rgba(0, 255, 0, 0.4),
+                0 0 18px 3px rgba(0, 255, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 8px 2px rgba(0, 255, 0, 0.8),
+                0 0 14px 4px rgba(0, 255, 0, 0.6),
+                0 0 20px 6px rgba(0, 255, 0, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px 2px rgba(0, 255, 0, 1),
+                0 0 16px 4px rgba(0, 255, 0, 0.8),
+                0 0 22px 6px rgba(0, 255, 0, 0.6);
+  }
+}
+
+/* Enemigos (fuego rojo) */
+.hero-image.enemy {
+  border: 2px solid #FF0000;   /* más fino */
+  animation: redFlames 1.5s infinite alternate;
+}
+
+@keyframes redFlames {
+  0% {
+    box-shadow: 0 0 6px 1px rgba(255, 0, 0, 0.6),
+                0 0 12px 2px rgba(255, 0, 0, 0.4),
+                0 0 18px 3px rgba(255, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 8px 2px rgba(255, 0, 0, 0.8),
+                0 0 14px 4px rgba(255, 0, 0, 0.6),
+                0 0 20px 6px rgba(255, 0, 0, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px 2px rgba(255, 0, 0, 1),
+                0 0 16px 4px rgba(255, 0, 0, 0.8),
+                0 0 22px 6px rgba(255, 0, 0, 0.6);
+  }
+}
+
+/* El wrapper permite poner un halo encima del <img> */
+.hero-wrap {
+  position: relative;
+  display: inline-block; /* o deja que el grid lo distribuya */
+  border-radius: 8px;    /* debe coincidir con la imagen si tiene bordes redondeados */
+}
+
+/* La imagen conserva los bordes/llamas de aliado/enemigo que ya definiste */
+.hero-image {
+  width: 64px;
+  height: 64px;
+  margin: 4px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+}
+
+
+.hero-image:hover { transform: scale(1.1); }
+
+/* === Recomendados: halo dorado independiente del borde === */
+.hero-wrap.recommended::after {
+  content: "";
+  position: absolute;
+  inset: -4px;             /* expande un poco fuera del borde de la imagen */
+  border-radius: 12px;     /* un poco mayor que el 8px de la imagen */
+  pointer-events: none;    /* no bloquea clicks */
+  animation: goldFlames 1.5s infinite alternate;
+}
+
+/* Llama dorada animada (sutil y fina) */
+@keyframes goldFlames {
+  0% {
+    box-shadow:
+      0 0 6px 1px rgba(255, 215, 0, 0.6),
+      0 0 12px 3px rgba(255, 215, 0, 0.4),
+      0 0 18px 6px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 8px 2px rgba(255, 215, 0, 0.8),
+      0 0 14px 5px rgba(255, 215, 0, 0.6),
+      0 0 20px 8px rgba(255, 215, 0, 0.4);
+  }
+  100% {
+    box-shadow:
+      0 0 10px 2px rgba(255, 215, 0, 1),
+      0 0 16px 6px rgba(255, 215, 0, 0.8),
+      0 0 22px 10px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.recommended-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 5px 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.1); /* fondo suave */
+}
+
+.hero-image.small {
+  width: 40px;
+  height: 40px;
+}
+
+.recommended-border {
+  border: 2px solid gold;
+  border-radius: 6px;
+  box-shadow: 0 0 10px 2px rgba(255, 215, 0, 0.8);
+  animation: goldPulse 1.5s infinite alternate;
+}
+
+@keyframes goldPulse {
+  from {
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+  }
+  to {
+    box-shadow: 0 0 14px rgba(255, 215, 0, 1);
+  }
+}
+
+
+

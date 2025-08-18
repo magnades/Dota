@@ -18,6 +18,7 @@ function App() {
   const [recommendations, setRecommendations] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlayerName, setSelectedPlayerName] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchHeroes().then(setHeroes).catch(console.error);
@@ -63,17 +64,39 @@ function App() {
   return (
     <div className="App">
       <h1>Dota Hero Selector</h1>
+      <input
+        type="text"
+        placeholder="Buscar héroe..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="search-box"
+      />
+
       <div className="grid">
-        {heroes.map((hero) => (
-          <img
-            key={hero.id}
-            src={`/hero_images/${hero.id}.png`}
-            alt={hero.name}
-            onClick={() => toggleSelection(hero, allies, setAllies)}
-            onContextMenu={(e) => { e.preventDefault(); toggleSelection(hero, enemies, setEnemies); }}
-            className="hero-image"
-          />
-        ))}
+        {heroes
+          .filter((hero) =>
+            hero.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .map((hero) => {
+            const isAlly = allies.some((h) => h.id === hero.id);
+            const isEnemy = enemies.some((h) => h.id === hero.id);
+            const isRecommended = recommendations.includes(hero.id);
+
+            return (
+              <div
+                key={hero.id}
+                className={`hero-wrap ${isRecommended ? "recommended" : ""}`}
+              >
+                <img
+                  src={`/hero_images/${hero.id}.png`}
+                  alt={hero.name}
+                  onClick={() => toggleSelection(hero, allies, setAllies)}
+                  onContextMenu={(e) => { e.preventDefault(); toggleSelection(hero, enemies, setEnemies); }}
+                  className={`hero-image ${isAlly ? "ally" : ""} ${isEnemy ? "enemy" : ""}`}
+                />
+              </div>
+            );
+          })}
       </div>
 
       {/* Contenedor para los equipos aliados y enemigos */}
